@@ -5,6 +5,8 @@ bool move_agent(const unsigned action, struct Cliff* cliff)
 {
     struct Position new_pos = cliff->agent.position;
 
+    printf("Action: %u\n", action);
+
     switch(action)
     {
         //Up
@@ -25,7 +27,7 @@ bool move_agent(const unsigned action, struct Cliff* cliff)
             break;
     }
 
-    printf("New pos: X: %i Y: %i \n", new_pos.x, new_pos.y);
+    //printf("New pos: X: %i Y: %i \n", new_pos.x, new_pos.y);
 
     //Check for invalid new state
     cliff->agent.position = calculate_new_position(new_pos,

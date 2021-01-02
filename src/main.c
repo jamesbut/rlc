@@ -1,9 +1,11 @@
 #include <domains/cliff_walking.h>
 #include <unistd.h>
+#include <optimisers/qlearning.h>
 
 int main() 
 {
 
+    /*
     struct Cliff cliff;
     cliff.width = 5;
     cliff.height = 3;
@@ -23,6 +25,12 @@ int main()
         if(finished)
             break;
     }
+    */
+
+    const unsigned num_states = 2;
+    const unsigned num_actions = 2;
+    double* q_table = create_q_table(num_states, num_actions);
+    print_q_table(q_table, num_states, num_actions);
 
     return 0;
 

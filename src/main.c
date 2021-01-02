@@ -27,8 +27,8 @@ int main()
     }
     */
 
-    const unsigned num_states = 2;
-    const unsigned num_actions = 2;
+    const unsigned num_states = 5;
+    const unsigned num_actions = 3;
     double* q_table = create_q_table(num_states, num_actions);
     print_q_table(q_table, num_states, num_actions);
 

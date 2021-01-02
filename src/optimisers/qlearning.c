@@ -10,7 +10,7 @@ double* create_q_table(const unsigned num_states,
 
     for(unsigned i = 0; i < num_states; i++)
         for(unsigned j = 0; j < num_actions; j++)
-            q_table[i * num_states + j]  = i * num_states + j;
+            q_table[i * num_actions + j] = i * num_actions + j;
 
     return q_table;
 }
@@ -22,7 +22,7 @@ void print_q_table(const double* q_table,
     for(unsigned i = 0; i < num_states; i++)
         for(unsigned j = 0; j < num_actions; j++)
         {
-            printf("%f ", q_table[i * num_states + j]);
+            printf("%f ", q_table[i * num_actions + j]);
             if(j == num_actions - 1)
                 printf("\n");
         }

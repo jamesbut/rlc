@@ -2,28 +2,83 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-double* create_q_table(const unsigned num_states,
+struct QTable create_q_table(const unsigned num_states,
                        const unsigned num_actions)
 {
-    
-    double* q_table = malloc(num_states * num_actions * sizeof(double));
 
+    struct QTable q_table;
+    q_table.num_states = num_states;
+    q_table.num_actions = num_actions;
+    
+    //double* q_table = malloc(num_states * num_actions * sizeof(double));
+    q_table.table = calloc(num_states * num_actions, sizeof(double));
+
+    /*
     for(unsigned i = 0; i < num_states; i++)
         for(unsigned j = 0; j < num_actions; j++)
             q_table[i * num_actions + j] = i * num_actions + j;
+    */
 
     return q_table;
 }
 
-void print_q_table(const double* q_table,
-                   const unsigned num_states,
-                   const unsigned num_actions)
+void print_q_table(const struct QTable* q_table)
 {
-    for(unsigned i = 0; i < num_states; i++)
-        for(unsigned j = 0; j < num_actions; j++)
+    for(unsigned i = 0; i < q_table->num_states; i++)
+        for(unsigned j = 0; j < q_table->num_actions; j++)
         {
-            printf("%f ", q_table[i * num_actions + j]);
-            if(j == num_actions - 1)
+            printf("%f ", q_table->table[i * q_table->num_actions + j]);
+            if(j == q_table->num_actions - 1)
                 printf("\n");
         }
+    printf("\n");
+}
+
+void set_q_value(struct QTable* q_table,
+                 const unsigned state,
+                 const unsigned action,
+                 const double value)
+{
+   
+    //Bounds checking
+    check_table_index_bounds(q_table, state, action);
+
+    //Insertion
+    q_table->table[state * q_table->num_actions + action] = value;
+
+}
+
+double get_q_value(struct QTable* q_table,
+                   const unsigned state,
+                   const unsigned action)
+{
+    //Bounds checking
+    check_table_index_bounds(q_table, state, action);
+
+    return q_table->table[state * q_table->num_actions + action];
+    
+}
+
+void check_table_index_bounds(const struct QTable* q_table,
+                              const unsigned state,
+                              const unsigned action)
+{
+    //Out of bounds checking
+    if(state >= q_table->num_states)
+    {
+        printf("There are not this many states in QTable!\n");
+        printf("Number of states in q table: %u\n", q_table->num_states);
+        printf("Given state: %u\n", state);
+        printf("Exiting program...\n");
+        exit(0);
+    }
+    if(action >= q_table->num_actions)
+    {
+        printf("There are not this many actions in QTable!\n");
+        printf("Number of actions in q table %u\n", q_table->num_actions);
+        printf("Given action: %u\n", action);
+        printf("Exiting program...\n");
+        exit(0);
+    }
+
 }

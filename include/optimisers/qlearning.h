@@ -19,7 +19,7 @@ void set_q_value(struct QTable* q_table,
                  const unsigned action,
                  const double value);
 
-double get_q_value(struct QTable* q_table,
+double get_q_value(const struct QTable* q_table,
                    const unsigned state,
                    const unsigned action);
 
@@ -27,5 +27,23 @@ double get_q_value(struct QTable* q_table,
 void check_table_index_bounds(const struct QTable* q_table,
                               const unsigned state,
                               const unsigned action);
+
+/*
+ * Q-Learning algorithm
+ * ---------------------
+ * Applies changes to a Q table
+ */
+
+struct QLearningParams {
+    const double alpha;
+    const double gamma;
+};
+
+void q_learning_step(struct QTable* q_table, const struct QLearningParams* params,
+                     const unsigned s, const unsigned a, const unsigned s_prime,
+                     const double r);
+
+//Calculates the action with the highest q value for a particular state
+unsigned calculate_max_action(const struct QTable* q_table, const unsigned s);
 
 #endif

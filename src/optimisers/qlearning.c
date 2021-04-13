@@ -48,7 +48,7 @@ void set_q_value(struct QTable* q_table,
 
 }
 
-double get_q_value(struct QTable* q_table,
+double get_q_value(const struct QTable* q_table,
                    const unsigned state,
                    const unsigned action)
 {
@@ -81,4 +81,25 @@ void check_table_index_bounds(const struct QTable* q_table,
         exit(0);
     }
 
+}
+
+void q_learning_step(struct QTable* q_table, const struct QLearningParams* params,
+                     const unsigned s, const unsigned a, const unsigned s_prime,
+                     const double r)
+{
+    const double max_action_q_val = get_q_value(q_table, s_prime,
+                                                calculate_max_action(q_table, s_prime));
+    const double new_q_val = get_q_value(q_table, s, a) + params->alpha *
+        (r + params->gamma * max_action_q_val - get_q_value(q_table, s, a));
+    set_q_value(q_table, s, a, new_q_val);
+}
+
+unsigned calculate_max_action(const struct QTable* q_table, const unsigned s)
+{
+    double max_q_val = 0.;
+    unsigned max_action = 0;
+    for(unsigned i = 0; i < q_table->num_actions; i++)
+        if(get_q_value(q_table, s, i) > max_q_val)
+            max_action = i;
+    return max_action;
 }

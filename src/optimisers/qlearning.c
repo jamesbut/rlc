@@ -3,13 +3,13 @@
 #include <stdio.h>
 
 struct QTable create_q_table(const unsigned num_states,
-                       const unsigned num_actions)
+                             const unsigned num_actions)
 {
 
     struct QTable q_table;
     q_table.num_states = num_states;
     q_table.num_actions = num_actions;
-    
+
     //double* q_table = malloc(num_states * num_actions * sizeof(double));
     q_table.table = calloc(num_states * num_actions, sizeof(double));
 
@@ -39,7 +39,7 @@ void set_q_value(struct QTable* q_table,
                  const unsigned action,
                  const double value)
 {
-   
+
     //Bounds checking
     check_table_index_bounds(q_table, state, action);
 
@@ -56,7 +56,7 @@ double get_q_value(struct QTable* q_table,
     check_table_index_bounds(q_table, state, action);
 
     return q_table->table[state * q_table->num_actions + action];
-    
+
 }
 
 void check_table_index_bounds(const struct QTable* q_table,

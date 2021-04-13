@@ -1,7 +1,8 @@
 #ifndef _Q_LEARNING_H_
 #define _Q_LEARNING_H_
 
-struct QTable 
+/* Q Table */
+struct QTable
 {
     unsigned num_states;
     unsigned num_actions;

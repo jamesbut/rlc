@@ -15,8 +15,6 @@ bool move_agent(const unsigned action, struct Cliff* cliff)
     //Otherwise apply action
     else
     {
-        printf("Action: %u\n", action);
-
         switch(action)
         {
             //Up

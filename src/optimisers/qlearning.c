@@ -110,7 +110,15 @@ unsigned calculate_max_action(const struct QTable* q_table, const unsigned s)
     return max_action;
 }
 
-unsigned sample_action(const struct QTable* q_table, const double epsilon)
+unsigned sample_action(const struct QTable* q_table, const unsigned state,
+                       const double epsilon)
 {
-
+    //Sample random number between 0 and 1
+    const double rand_num = (double)rand() / (double)RAND_MAX;
+    if(rand_num < epsilon)
+        //Return random action
+        return rand() % q_table->num_actions;
+    else
+        //Return action with max q value
+        return calculate_max_action(q_table, state);
 }

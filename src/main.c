@@ -26,12 +26,15 @@ int main()
 
     display_cliff(&cliff_walking.cliff);
     print_q_table(&q_table);
-    for(size_t i = 0; i < num_moves; i++)
+    //for(size_t i = 0; i < num_moves; i++)
+    while(true)
     {
-        sleep(1);
+        //sleep(1);
 
         //Sample action
-        const unsigned action = sample_action(&q_table, epsilon);
+        const unsigned action = sample_action(&q_table,
+                                              cliff_walking.cliff.agent.state,
+                                              epsilon);
         printf("Action: %u\n", action);
 
         //Take step in environment

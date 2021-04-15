@@ -49,6 +49,7 @@ void q_learning_step(struct QTable* q_table, const struct QLearningParams* param
 unsigned calculate_max_action(const struct QTable* q_table, const unsigned s);
 
 //Samples action according to epsilon greedy policy
-unsigned sample_action(const struct QTable* q_table, const double epsilon);
+unsigned sample_action(const struct QTable* q_table, const unsigned state,
+                       const double epsilon);
 
 #endif

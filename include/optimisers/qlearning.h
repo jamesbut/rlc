@@ -1,6 +1,8 @@
 #ifndef _Q_LEARNING_H_
 #define _Q_LEARNING_H_
 
+#include <optimisers/experience_tuple.h>
+
 /* Q Table */
 struct QTable
 {
@@ -34,16 +36,19 @@ void check_table_index_bounds(const struct QTable* q_table,
  * Applies changes to a Q table
  */
 
-struct QLearningParams {
+struct QLearningParams
+{
     const double alpha;
     const double gamma;
 };
 
 void q_learning_step(struct QTable* q_table, const struct QLearningParams* params,
-                     const unsigned s, const unsigned a, const unsigned s_prime,
-                     const double r);
+                     const struct Experience experience);
 
 //Calculates the action with the highest q value for a particular state
 unsigned calculate_max_action(const struct QTable* q_table, const unsigned s);
+
+//Samples action according to epsilon greedy policy
+unsigned sample_action(const struct QTable* q_table, const double epsilon);
 
 #endif

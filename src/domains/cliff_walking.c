@@ -175,3 +175,18 @@ double reward_function(const struct CliffWalking* cliff_walking)
 {
     return cliff_walking->reward_table[cliff_walking->cliff.agent.state];
 }
+
+struct Experience agent_step(struct CliffWalking* cliff_walking, const unsigned action)
+{
+
+    struct Experience experience;
+    experience.s = cliff_walking->cliff.agent.state;
+    experience.a = action;
+
+    move_agent(action, &cliff_walking->cliff);
+
+    experience.s_prime = cliff_walking->cliff.agent.state;
+    experience.r = reward_function(cliff_walking);
+
+    return experience;
+}

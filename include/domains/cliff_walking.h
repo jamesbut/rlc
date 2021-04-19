@@ -38,6 +38,9 @@ void display_cliff(const struct Cliff* cliff);
 //Returns true if agent gets to finish
 bool move_agent(const unsigned action, struct Cliff* cliff);
 
+//Resets agent to start
+void reset_agent(struct Cliff* cliff);
+
 bool check_invalid_state(struct Position new_pos,
                          const unsigned cliff_width,
                          const unsigned cliff_height);

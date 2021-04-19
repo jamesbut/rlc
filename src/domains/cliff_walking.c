@@ -6,35 +6,24 @@ bool move_agent(const unsigned action, struct Cliff* cliff)
 {
     struct Position new_pos = cliff->agent.position;
 
-    //Reset agent to start if agent has fallen
-    if(is_drop(cliff->agent.position.x, cliff->agent.position.y, cliff))
+    switch(action)
     {
-        new_pos.x = 0;
-        new_pos.y = cliff->height-1;
-    }
-    //Otherwise apply action
-    else
-    {
-        switch(action)
-        {
-            //Up
-            case 0:
-                new_pos.y -= 1;
-                break;
-            //Down
-            case 1:
-                new_pos.y += 1;
-                break;
-            //Left
-            case 2:
-                new_pos.x -= 1;
-                break;
-            //Right
-            case 3:
-                new_pos.x += 1;
-                break;
-        }
-
+        //Up
+        case 0:
+            new_pos.y -= 1;
+            break;
+        //Down
+        case 1:
+            new_pos.y += 1;
+            break;
+        //Left
+        case 2:
+            new_pos.x -= 1;
+            break;
+        //Right
+        case 3:
+            new_pos.x += 1;
+            break;
     }
 
     //Check for invalid new state
@@ -46,11 +35,21 @@ bool move_agent(const unsigned action, struct Cliff* cliff)
     cliff->agent.state = get_state_value(cliff);
 
     //Check for finish
-    if(is_finish(cliff->agent.position.x, cliff->agent.position.y, cliff))
+    if(is_finish(cliff->agent.position.x, cliff->agent.position.y, cliff) ||
+       is_drop(cliff->agent.position.x, cliff->agent.position.y, cliff))
         return true;
 
     return false;
 
+}
+
+void reset_agent(struct Cliff* cliff)
+{
+    cliff->agent.position.x = 0;
+    cliff->agent.position.y = cliff->height-1;
+
+    //Recalculate agent's state value
+    cliff->agent.state = get_state_value(cliff);
 }
 
 //Check whether new state is valid, start, finish or a cliff drop
@@ -181,7 +180,7 @@ struct Experience agent_step(struct CliffWalking* cliff_walking, const unsigned 
     experience.s = cliff_walking->cliff.agent.state;
     experience.a = action;
 
-    move_agent(action, &cliff_walking->cliff);
+    experience.episode_end = move_agent(action, &cliff_walking->cliff);
 
     experience.s_prime = cliff_walking->cliff.agent.state;
     experience.r = reward_function(cliff_walking);

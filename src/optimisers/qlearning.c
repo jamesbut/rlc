@@ -102,7 +102,7 @@ void q_learning_step(struct QTable* q_table, const struct QLearningParams* param
 
 unsigned calculate_max_action(const struct QTable* q_table, const unsigned s)
 {
-    double max_q_val = 0.;
+    double max_q_val = get_q_value(q_table, s, 0);
     unsigned max_action = 0;
     for(unsigned i = 0; i < q_table->num_actions; i++)
         if(get_q_value(q_table, s, i) > max_q_val)

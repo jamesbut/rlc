@@ -138,9 +138,7 @@ struct CliffWalking create_cliff_walking(const unsigned cliff_width,
     struct Cliff cliff;
     cliff.width = cliff_width;
     cliff.height = cliff_height;
-    cliff.agent.position.x = 0;
-    cliff.agent.position.y = cliff.height-1;
-    cliff.agent.state = get_state_value(&cliff);
+    reset_agent(&cliff);
 
     struct CliffWalking cliff_walking;
     cliff_walking.cliff = cliff;

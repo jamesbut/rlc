@@ -40,6 +40,7 @@ struct QLearningParams
 {
     const double alpha;
     const double gamma;
+    const double epsilon;
 };
 
 void q_learning_step(struct QTable* q_table, const struct QLearningParams* params,

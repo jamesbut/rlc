@@ -5,7 +5,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-const unsigned num_episodes = 500;
+const unsigned num_episodes = 100;
 
 struct EpisodeResults
 {
@@ -154,10 +154,20 @@ void write_exp_data(const double avg_cumm_reward[], const double avg_total_steps
 
     FILE* fpt = fopen(file_path, "w+");
     for(unsigned i = 0; i < num_episodes; i++)
-        fprintf(fpt, "%f ", avg_cumm_reward[i]);
+    {
+        if(i != (num_episodes-1))
+            fprintf(fpt, "%f,", avg_cumm_reward[i]);
+        else
+            fprintf(fpt, "%f", avg_cumm_reward[i]);
+    }
     fprintf(fpt, "\n");
     for(unsigned i = 0; i < num_episodes; i++)
-        fprintf(fpt, "%f ", avg_total_steps[i]);
+    {
+        if(i != (num_episodes-1))
+            fprintf(fpt, "%f,", avg_total_steps[i]);
+        else
+            fprintf(fpt, "%f", avg_total_steps[i]);
+    }
     fclose(fpt);
 }
 
@@ -180,7 +190,7 @@ int main()
                                              potential_reward_type};
 
     //Run multiple experiments
-    const unsigned num_exps = 100;
+    const unsigned num_exps = 1000;
     double total_cumm_rewards[num_episodes] = {0.};
     unsigned total_steps[num_episodes] = {0};
 

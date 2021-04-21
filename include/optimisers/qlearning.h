@@ -2,6 +2,7 @@
 #define _Q_LEARNING_H_
 
 #include <optimisers/experience_tuple.h>
+#include <domains/cliff.h>
 
 /* Q Table */
 struct QTable
@@ -41,10 +42,17 @@ struct QLearningParams
     const double alpha;
     const double gamma;
     const double epsilon;
+    /*
+     * Specifies which potential reward functions is used:
+     * 0: no potential reward
+     * 1: manhattan distance
+     */
+    const unsigned potential_reward_type;
 };
 
 void q_learning_step(struct QTable* q_table, const struct QLearningParams* params,
-                     const struct Experience experience);
+                     const struct Experience experience,
+                     const struct Cliff* cliff);
 
 //Calculates the action with the highest q value for a particular state
 unsigned calculate_max_action(const struct QTable* q_table, const unsigned s);

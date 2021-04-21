@@ -1,6 +1,7 @@
 #include <optimisers/qlearning.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <optimisers/potential_function.h>
 
 struct QTable create_q_table(const unsigned num_states,
                              const unsigned num_actions)
@@ -84,7 +85,8 @@ void check_table_index_bounds(const struct QTable* q_table,
 }
 
 void q_learning_step(struct QTable* q_table, const struct QLearningParams* params,
-                     const struct Experience experience)
+                     const struct Experience experience,
+                     const struct Cliff* cliff)
 {
     //Unpack experience to make code look nicer
     const unsigned s = experience.s;
@@ -95,8 +97,15 @@ void q_learning_step(struct QTable* q_table, const struct QLearningParams* param
     //Q learning step
     const double max_action_q_val = get_q_value(q_table, experience.s_prime,
                                                 calculate_max_action(q_table, s_prime));
+    //Q-Learning with potential function
     const double new_q_val = get_q_value(q_table, s, a) + params->alpha *
-        (r + params->gamma * max_action_q_val - get_q_value(q_table, s, a));
+            (r + params->gamma * (max_action_q_val +
+                                  potential_function(s_prime, cliff,
+                                                     params->potential_reward_type)) -
+             get_q_value(q_table, s, a) -
+             potential_function(s, cliff, params->potential_reward_type));
+
+    //Update QTable
     set_q_value(q_table, s, a, new_q_val);
 }
 

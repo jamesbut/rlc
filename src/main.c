@@ -2,11 +2,22 @@
 #include <unistd.h>
 #include <optimisers/qlearning.h>
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
+const unsigned num_episodes = 500;
 
 struct EpisodeResults
 {
     const double reward_cumm;
     const unsigned total_steps;
+};
+
+struct TrainResults
+{
+    double cumm_rewards[num_episodes];
+    unsigned ep_lengths[num_episodes];
+    struct QTable final_q_table;
 };
 
 struct EpisodeResults run_episode(struct CliffWalking* cliff_walking,
@@ -40,13 +51,12 @@ struct EpisodeResults run_episode(struct CliffWalking* cliff_walking,
         else
             action = calculate_max_action(q_table, cliff_walking->cliff.agent.state);
 
-
         //Take step in environment
         const struct Experience experience = agent_step(cliff_walking, action);
 
         //Update QTable
         if(training)
-            q_learning_step(q_table, q_params, experience);
+            q_learning_step(q_table, q_params, experience, &cliff_walking->cliff);
 
         if(verbosity)
         {
@@ -72,9 +82,9 @@ struct EpisodeResults run_episode(struct CliffWalking* cliff_walking,
 }
 
 //Trains agent a returns learnt QTable
-struct QTable train_agent(struct CliffWalking cliff_walking,
-                          const struct QLearningParams q_params,
-                          const unsigned num_episodes)
+struct TrainResults train_agent(struct CliffWalking cliff_walking,
+                                const struct QLearningParams q_params,
+                                const unsigned num_episodes)
 {
     const unsigned num_states = cliff_walking.cliff.width * cliff_walking.cliff.height;
     const unsigned num_actions = 4;
@@ -93,17 +103,26 @@ struct QTable train_agent(struct CliffWalking cliff_walking,
         episode_lengths[i] = ep_results.total_steps;
     }
 
+    /*
     printf("Final Q-table:\n");
     print_q_table(&q_table);
     printf("Cummulative rewards:\n");
     for(unsigned i = 0; i < num_episodes; i++)
         printf("%f ", cumm_rewards[i]);
-    printf("Episode lengths:\n");
+    printf("\nEpisode lengths:\n");
     for(unsigned i = 0; i < num_episodes; i++)
         printf("%u ", episode_lengths[i]);
     printf("\n");
+    */
 
-    return q_table;
+    struct TrainResults train_results;
+    for(unsigned i = 0; i < num_episodes; i++)
+    {
+        train_results.cumm_rewards[i] = cumm_rewards[i];
+        train_results.ep_lengths[i] = episode_lengths[i];
+    }
+    train_results.final_q_table = q_table;
+    return train_results;
 
 }
 
@@ -119,30 +138,86 @@ void test_agent(struct CliffWalking cliff_walking, struct QTable q_table)
 
 }
 
+void write_exp_data(const double avg_cumm_reward[], const double avg_total_steps[],
+                    const unsigned potential_reward_type)
+{
+    char* file_path;
+    switch(potential_reward_type)
+    {
+        case 0:
+            file_path = "../data/no_potential_reward_results.csv";
+            break;
+        case 1:
+            file_path = "../data/manhattan_potential_reward_results.csv";
+            break;
+    }
+
+    FILE* fpt = fopen(file_path, "w+");
+    for(unsigned i = 0; i < num_episodes; i++)
+        fprintf(fpt, "%f ", avg_cumm_reward[i]);
+    fprintf(fpt, "\n");
+    for(unsigned i = 0; i < num_episodes; i++)
+        fprintf(fpt, "%f ", avg_total_steps[i]);
+    fclose(fpt);
+}
+
 int main()
 {
+    //Initialise random seed
+    srand(time(NULL));
 
     //Domain
     const unsigned cliff_width = 12;
     const unsigned cliff_height = 4;
     struct CliffWalking cliff_walking = create_cliff_walking(cliff_width, cliff_height);
-    const unsigned num_episodes = 500;
 
     //Q-Learning
     const double alpha = 0.5;
     const double gamma = 0.9;
     const double epsilon = 0.1;
-    const struct QLearningParams q_params = {.alpha = alpha, .gamma = gamma,
-                                             .epsilon = epsilon};
+    const unsigned potential_reward_type = 1;
+    const struct QLearningParams q_params = {alpha, gamma, epsilon,
+                                             potential_reward_type};
 
-    //Train agent
-    const struct QTable learnt_q_table = train_agent(cliff_walking,
-                                                     q_params,
-                                                     num_episodes);
+    //Run multiple experiments
+    const unsigned num_exps = 100;
+    double total_cumm_rewards[num_episodes] = {0.};
+    unsigned total_steps[num_episodes] = {0};
 
-    //sleep(5);
+    for(unsigned i = 0; i < num_exps; i++)
+    {
+        //Train agent
+        const struct TrainResults train_results = train_agent(cliff_walking,
+                                                              q_params,
+                                                              num_episodes);
+        for(unsigned j = 0; j < num_episodes; j++)
+        {
+            total_cumm_rewards[j] += train_results.cumm_rewards[j];
+            total_steps[j] += train_results.ep_lengths[j];
+        }
+    }
+
+    double avg_cumm_rewards[num_episodes];
+    double avg_total_steps[num_episodes];
+    for(unsigned i = 0; i < num_episodes; i++)
+    {
+        avg_cumm_rewards[i] = total_cumm_rewards[i] / (double)num_exps;
+        avg_total_steps[i] = (double)total_steps[i] / (double)num_exps;
+    }
+
+    printf("Average cummulative rewards:\n");
+    for(unsigned i = 0; i < num_episodes; i++)
+        printf("%f ", avg_cumm_rewards[i]);
+    printf("\n");
+    printf("Average total number of steps:\n");
+    for(unsigned i = 0; i < num_episodes; i++)
+        printf("%f ", avg_total_steps[i]);
+    printf("\n");
+
+    write_exp_data(avg_cumm_rewards, avg_total_steps, potential_reward_type);
+
     //Test agent by doing an environment run through with no exploration
-    test_agent(cliff_walking, learnt_q_table);
+    //test_agent(cliff_walking, train_results.final_q_table);
 
     return 0;
 

@@ -190,7 +190,7 @@ int main()
                                              potential_reward_type};
 
     //Run multiple experiments
-    const unsigned num_exps = 1000;
+    const unsigned num_exps = 1;
     double total_cumm_rewards[num_episodes] = {0.};
     unsigned total_steps[num_episodes] = {0};
 
@@ -205,6 +205,9 @@ int main()
             total_cumm_rewards[j] += train_results.cumm_rewards[j];
             total_steps[j] += train_results.ep_lengths[j];
         }
+
+        //Test agent by doing an environment run through with no exploration
+        test_agent(cliff_walking, train_results.final_q_table);
     }
 
     double avg_cumm_rewards[num_episodes];
@@ -225,9 +228,6 @@ int main()
     printf("\n");
 
     write_exp_data(avg_cumm_rewards, avg_total_steps, potential_reward_type);
-
-    //Test agent by doing an environment run through with no exploration
-    //test_agent(cliff_walking, train_results.final_q_table);
 
     return 0;
 
